@@ -45,7 +45,7 @@ class InvestecOpenApi::Client
 
   def connection
     @_connection ||= Faraday.new(url: API_URL) do |builder|
-      if token
+      if @token
         builder.headers['Authorization'] = "Bearer #{@token}"
       end
 
