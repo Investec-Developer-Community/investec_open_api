@@ -1,0 +1,2 @@
+class InvestecOpenApi::Client
+end
