@@ -1,6 +1,7 @@
 require "rspec"
 require "bundler/setup"
 require "investec_open_api"
+require 'webmock/rspec'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

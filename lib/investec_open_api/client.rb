@@ -27,6 +27,7 @@ class InvestecOpenApi::Client
     end
   end
 
+  private 
   def get_oauth_token(username:, password:)
     auth_connection = Faraday.new(url: API_URL) do |builder|
       builder.basic_auth(username, password)
