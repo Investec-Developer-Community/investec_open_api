@@ -13,9 +13,9 @@ RSpec.describe InvestecOpenApi::Models::Account do
           "productName" => "Private Bank Account"
         })
   
-        expect(model_instance.account_id).to eq "12345"
-        expect(model_instance.account_number).to eq "67890"
-        expect(model_instance.account_name).to eq "Test User"
+        expect(model_instance.id).to eq "12345"
+        expect(model_instance.number).to eq "67890"
+        expect(model_instance.name).to eq "Test User"
         expect(model_instance.reference_name).to eq "Savings Account"
         expect(model_instance.product_name).to eq "Private Bank Account"
       end
@@ -28,9 +28,9 @@ RSpec.describe InvestecOpenApi::Models::Account do
           "bankAccountNumber" => "67890"
         })
 
-        expect(model_instance.account_id).to eq "12345"
-        expect(model_instance.account_number).to eq nil
-        expect(model_instance.account_name).to eq nil
+        expect(model_instance.id).to eq "12345"
+        expect(model_instance.number).to eq nil
+        expect(model_instance.name).to eq nil
         expect(model_instance.reference_name).to eq nil
         expect(model_instance.product_name).to eq nil
 
