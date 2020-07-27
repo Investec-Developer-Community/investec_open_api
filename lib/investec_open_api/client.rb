@@ -1,16 +1,11 @@
 require "faraday"
+require "faraday_middleware"
 require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
 
 class InvestecOpenApi::Client
-  API_URL = InvestecOpenApi.api_url
-
   def authenticate!
-    auth = get_oauth_token(
-      username: InvestecOpenApi.api_username,
-      password: InvestecOpenApi.api_password
-    )
-    @token = auth['access_token']
+    @token = get_oauth_token["access_token"]
   end
 
   def accounts
@@ -20,17 +15,19 @@ class InvestecOpenApi::Client
     end
   end
 
-  def transactions(account_id:)
+  def transactions(account_id)
     response = connection.get("za/pb/v1/accounts/#{account_id}/transactions")
     response.body["data"]["transactions"].map do |transaction_raw|
       InvestecOpenApi::Models::Transaction.from_api(transaction_raw)
     end
   end
 
-  private 
-  def get_oauth_token(username:, password:)
-    auth_connection = Faraday.new(url: API_URL) do |builder|
-      builder.basic_auth(username, password)
+  private
+
+  def get_oauth_token
+    auth_connection = Faraday.new(url: InvestecOpenApi.api_url) do |builder|
+      builder.headers["Accept"] = "application/json"
+      builder.basic_auth(InvestecOpenApi.api_username, InvestecOpenApi.api_password)
       builder.response :raise_error
       builder.response :json
       builder.adapter Faraday.default_adapter
@@ -45,11 +42,12 @@ class InvestecOpenApi::Client
   end
 
   def connection
-    @_connection ||= Faraday.new(url: API_URL) do |builder|
+    @_connection ||= Faraday.new(url: InvestecOpenApi.api_url) do |builder|
       if @token
-        builder.headers['Authorization'] = "Bearer #{@token}"
+        builder.headers["Authorization"] = "Bearer #{@token}"
       end
 
+      builder.headers["Accept"] = "application/json"
       builder.request :json
 
       builder.response :raise_error
