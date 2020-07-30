@@ -1,5 +1,7 @@
 # InvestecOpenApi Client
 
+[![Gem Version](https://badge.fury.io/rb/investec_open_api.svg)](https://badge.fury.io/rb/investec_open_api)
+
 A simple client wrapper for the [Investec Open API](https://developer.investec.com/programmable-banking/#open-api). 
 
 *Features:*
