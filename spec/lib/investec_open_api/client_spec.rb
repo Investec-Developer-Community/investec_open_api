@@ -67,15 +67,15 @@ RSpec.describe InvestecOpenApi::Client do
 
       expect(accounts.first).to be_an_instance_of(InvestecOpenApi::Models::Account)
 
-      expect(accounts.first.account_id).to eq "12345"
-      expect(accounts.first.account_number).to eq "67890"
-      expect(accounts.first.account_name).to eq "Test User"
+      expect(accounts.first.id).to eq "12345"
+      expect(accounts.first.number).to eq "67890"
+      expect(accounts.first.name).to eq "Test User"
       expect(accounts.first.reference_name).to eq "My Private Investec Bank Account"
       expect(accounts.first.product_name).to eq "Private Bank Account"
 
-      expect(accounts.last.account_id).to eq "223344"
-      expect(accounts.last.account_number).to eq "556677"
-      expect(accounts.last.account_name).to eq "Test User"
+      expect(accounts.last.id).to eq "223344"
+      expect(accounts.last.number).to eq "556677"
+      expect(accounts.last.name).to eq "Test User"
       expect(accounts.last.reference_name).to eq "My Private Investec Savings Account"
       expect(accounts.last.product_name).to eq "Private Savings Account"
     end
