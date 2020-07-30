@@ -12,11 +12,12 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
           "cardNumber" => "400000xxxxxx0001",
           "amount" => 50000,
           "description" => "COFFEE",
+          "transactionDate" => "2020-07-13",
           "postingDate" => "2020-07-14",
           "valueDate" => "2020-07-15",
           "actionDate" => "2020-07-21"
         })
-  
+
         expect(model_instance.account_id).to eq "12345"
         expect(model_instance.type).to eq "DEBIT"
         expect(model_instance.status).to eq "POSTED"
@@ -24,6 +25,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         expect(model_instance.amount.class).to eq Money
         expect(model_instance.amount.to_f).to eq -50000.0
         expect(model_instance.description).to eq "COFFEE"
+        expect(model_instance.date).to eq Date.parse("2020-07-13")
         expect(model_instance.posting_date).to eq Date.parse("2020-07-14")
         expect(model_instance.value_date).to eq Date.parse("2020-07-15")
         expect(model_instance.action_date).to eq Date.parse("2020-07-21")
@@ -47,7 +49,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
   end
 
   describe "#id" do
-    it "creates a unique ID based on the amount, description and posting_date" do
+    it "creates a unique ID based on the amount, description and date" do
       model_instance = InvestecOpenApi::Models::Transaction.from_api({
         "accountId" => "12345",
         "type" => "DEBIT",
@@ -55,12 +57,13 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         "cardNumber" => "400000xxxxxx0001",
         "amount" => 50000,
         "description" => "COFFEE ORDER",
+        "transactionDate" => "2020-07-13",
         "postingDate" => "2020-07-14",
         "valueDate" => "2020-07-15",
         "actionDate" => "2020-07-21"
       })
 
-      expect(model_instance.id).to eq "-50000-COFFEE ORDER-2020-07-14"
+      expect(model_instance.id).to eq "-50000-COFFEE ORDER-2020-07-13"
     end
   end
 end

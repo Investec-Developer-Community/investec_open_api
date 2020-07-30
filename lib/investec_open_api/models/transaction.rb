@@ -8,6 +8,7 @@ module InvestecOpenApi::Models
     attribute :card_number
     attribute :amount
     attribute :description
+    attribute :date, type: Date
     attribute :posting_date, type: Date
     attribute :value_date, type: Date
     attribute :action_date, type: Date
@@ -18,7 +19,7 @@ module InvestecOpenApi::Models
       [
         amount.to_i,
         description,
-        posting_date.to_s
+        date.to_s
       ].map(&:to_s).join('-')
     end
 
@@ -27,6 +28,10 @@ module InvestecOpenApi::Models
         adjusted_amount = params['amount'] * 100
         adjusted_amount = -adjusted_amount if params['type'] == 'DEBIT'
         params['amount'] = Money.new(adjusted_amount, "ZAR")
+      end
+
+      if params['transactionDate']
+        params['date'] = params['transactionDate']
       end
 
       super
