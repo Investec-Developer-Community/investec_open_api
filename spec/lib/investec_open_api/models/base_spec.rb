@@ -1,5 +1,3 @@
-require "spec_helper"
-
 RSpec.describe InvestecOpenApi::Models::Base do
   describe "#from_api" do
     it "returns a new instance of InvestecOpenApi::Models::Base without attributes" do

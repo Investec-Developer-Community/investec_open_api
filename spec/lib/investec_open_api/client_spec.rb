@@ -1,8 +1,3 @@
-require "spec_helper"
-require "investec_open_api/client"
-require "investec_open_api/models/account"
-require "investec_open_api/models/transaction"
-
 RSpec.describe InvestecOpenApi::Client do
   let(:client) { InvestecOpenApi::Client.new }
 
@@ -80,7 +75,7 @@ RSpec.describe InvestecOpenApi::Client do
       expect(accounts.last.product_name).to eq "Private Savings Account"
     end
   end
- 
+
   describe "#transactions" do
     before do
       stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/12345/transactions")

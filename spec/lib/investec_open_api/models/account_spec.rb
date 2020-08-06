@@ -1,5 +1,3 @@
-require "spec_helper"
-
 RSpec.describe InvestecOpenApi::Models::Account do
   describe "#from_api" do
     context "with valid attributes" do

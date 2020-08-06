@@ -1,6 +1,3 @@
-require "spec_helper"
-require "investec_open_api/models/transaction"
-
 RSpec.describe InvestecOpenApi::Models::Transaction do
   describe "#from_api" do
     context "with valid attributes" do

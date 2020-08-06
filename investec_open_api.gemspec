@@ -26,4 +26,14 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+
+  spec.add_runtime_dependency "active_attr"
+  spec.add_runtime_dependency "money"
+  spec.add_runtime_dependency "faraday"
+  spec.add_runtime_dependency "faraday_middleware"
+
+  spec.add_development_dependency "rake", "~> 12.0"
+  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "webmock"
+  spec.add_development_dependency "pry"
 end

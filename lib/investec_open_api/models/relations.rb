@@ -2,8 +2,10 @@ module InvestecOpenApi::Models
   module Relations
     extend self
 
+    class RelationshipError < StandardError; end
+
     def has_many(relation, params)
-      raise "RelationshipError: A valid class_name is required" unless params[:class_name]
+      raise RelationshipError, "A valid class_name is required" unless params[:class_name]
 
       self.define_method(relation) do
         klass = Object.const_get("#{self.class.module_parent}::#{params[:class_name]}")
@@ -12,13 +14,12 @@ module InvestecOpenApi::Models
     end
 
     def belongs_to(relation, params)
-      raise "RelationshipError: A valid class_name is required" unless params[:class_name]
+      raise RelationshipError, "A valid class_name is required" unless params[:class_name]
 
       self.define_method(relation) do
         klass = Object.const_get("#{self.class.module_parent}::#{params[:class_name]}")
         klass.find(self.send("#{relation}_id".to_sym))
       end
     end
-
   end
 end
