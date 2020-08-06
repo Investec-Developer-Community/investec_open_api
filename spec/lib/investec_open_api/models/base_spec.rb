@@ -1,5 +1,4 @@
 require "spec_helper"
-require "investec_open_api/models/base"
 
 RSpec.describe InvestecOpenApi::Models::Base do
   describe "#from_api" do

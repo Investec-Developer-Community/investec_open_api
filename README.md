@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/investec_open_api.svg)](https://badge.fury.io/rb/investec_open_api)
 [![Build Status](https://travis-ci.com/Offerzen/investec_open_api.svg?branch=master)](https://travis-ci.com/Offerzen/investec_open_api)
 
-A simple client wrapper for the [Investec Open API](https://developer.investec.com/programmable-banking/#open-api). 
+A simple client wrapper for the [Investec Open API](https://developer.investec.com/programmable-banking/#open-api).
 
 *Features:*
 
@@ -64,6 +64,10 @@ Use the ID of one of your accounts to retrieve transactions:
 
 ```ruby
 client.transactions(my_account.id)
+
+# alternatively
+transactions = my_account.transactions
+account = transactions.first.account
 ```
 
 ## License

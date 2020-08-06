@@ -66,4 +66,48 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
       expect(model_instance.id).to eq "-50000-COFFEE ORDER-2020-07-13"
     end
   end
+
+  describe "#account" do
+    let(:transaction) do
+      InvestecOpenApi::Models::Transaction.from_api({
+        "accountId" => "12345",
+        "type" => "DEBIT",
+        "status" => "POSTED",
+        "cardNumber" => "400000xxxxxx0001",
+        "amount" => 50000,
+        "description" => "COFFEE ORDER",
+        "transactionDate" => "2020-07-13",
+        "postingDate" => "2020-07-14",
+        "valueDate" => "2020-07-15",
+        "actionDate" => "2020-07-21"
+      })
+    end
+
+    it "responds to #account" do
+      expect(transaction.respond_to?(:account)).to be_truthy
+    end
+  end
+
+  describe ".where" do
+    let(:account) do
+      InvestecOpenApi::Models::Account.from_api({
+          "accountId" => "12345",
+          "accountNumber" => "67890",
+          "accountName" => "Test User",
+          "referenceName" => "Savings Account",
+          "productName" => "Private Bank Account"
+        })
+    end
+
+    it "finds all transactions that match an account" do
+      expect_any_instance_of(InvestecOpenApi::Client).to receive(:transactions).with(account.id)
+      described_class.where(account_id: account.id)
+    end
+
+    context "when an account_id is not specified" do
+      it "raises an error" do
+        expect{ described_class.where() }.to raise_error(InvestecOpenApi::NotFoundError)
+      end
+    end
+  end
 end

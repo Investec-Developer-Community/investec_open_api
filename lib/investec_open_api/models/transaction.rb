@@ -13,6 +13,13 @@ module InvestecOpenApi::Models
     attribute :value_date, type: Date
     attribute :action_date, type: Date
 
+    belongs_to :account, class_name: "Account"
+
+    def self.where(params = { account_id: nil })
+      raise InvestecOpenApi::NotFoundError, "a valid account_id my be specified" unless params[:account_id]
+      client.transactions(params[:account_id])
+    end
+
     # At this point, there is no unique identifier being returned from Investec's API.
     # This method serves to create a stable unique identifier based on the transaction details.
     def id
