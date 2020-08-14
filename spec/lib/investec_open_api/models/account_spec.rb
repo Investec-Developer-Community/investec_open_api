@@ -15,6 +15,47 @@ RSpec.describe InvestecOpenApi::Models::Account do
         }
       )
       .to_return(body: { "access_token" => "123","token_type" => "Bearer", "expires_in" => 1799, "scope" =>"accounts" }.to_json)
+
+    stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/12345/transactions")
+      .with(
+        body: "",
+        headers: {
+          "Accept" => "application/json",
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "Authorization" => "Bearer 123",
+          "User-Agent" => "Faraday v1.0.1"
+        }
+      )
+      .to_return(
+        body: {
+          data: {
+            transactions: [
+              {
+                "accountId": "12345",
+                "type": "DEBIT",
+                "status": "POSTED",
+                "description": "MONTHLY SERVICE CHARGE",
+                "cardNumber": "",
+                "postingDate": "2020-06-11",
+                "valueDate": "2020-06-10",
+                "actionDate": "2020-06-18",
+                "amount": 535
+              },
+              {
+                "accountId": "12345",
+                "type": "CREDIT",
+                "status": "POSTED",
+                "description": "CREDIT INTEREST",
+                "cardNumber": "",
+                "postingDate": "2020-06-11",
+                "valueDate": "2020-06-10",
+                "actionDate": "2020-06-18",
+                "amount": 31.09
+              }
+            ]
+          }
+        }.to_json
+      )
   end
 
   describe "#from_api" do
@@ -67,6 +108,14 @@ RSpec.describe InvestecOpenApi::Models::Account do
 
     it "responds to #transactions" do
       expect(account.respond_to?(:transactions)).to be_truthy
+    end
+
+    context "when the api returns transactions" do
+      it "returns the account's transactions" do
+        expected_transactions = account.transactions
+        expect(expected_transactions).to be_an_instance_of(Array)
+        expect(expected_transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+      end
     end
   end
 
