@@ -89,6 +89,65 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
   end
 
   describe ".where" do
+    before do
+      InvestecOpenApi.api_url = "https://openapistg.investec.com/"
+      InvestecOpenApi.api_username = "Test"
+      InvestecOpenApi.api_password = "Secret"
+
+      stub_request(:post, "#{InvestecOpenApi.api_url}identity/v2/oauth2/token")
+        .with(
+          body: "grant_type=client_credentials&scope=accounts",
+          headers: {
+            "Accept" => "application/json",
+            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "Authorization" => Faraday::Connection.new.basic_auth("Test", "Secret"),
+            "User-Agent" => "Faraday v1.0.1"
+          }
+        )
+        .to_return(body: { "access_token" => "123","token_type" => "Bearer", "expires_in" => 1799, "scope" =>"accounts" }.to_json)
+
+      stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/12345/transactions")
+        .with(
+          body: "",
+          headers: {
+            "Accept" => "application/json",
+            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "Authorization" => "Bearer 123",
+            "User-Agent" => "Faraday v1.0.1"
+          }
+        )
+        .to_return(
+          body: {
+            data: {
+              transactions: [
+                {
+                  "accountId": "12345",
+                  "type": "DEBIT",
+                  "status": "POSTED",
+                  "description": "MONTHLY SERVICE CHARGE",
+                  "cardNumber": "",
+                  "postingDate": "2020-06-11",
+                  "valueDate": "2020-06-10",
+                  "actionDate": "2020-06-18",
+                  "amount": 535
+                },
+                {
+                  "accountId": "12345",
+                  "type": "CREDIT",
+                  "status": "POSTED",
+                  "description": "CREDIT INTEREST",
+                  "cardNumber": "",
+                  "postingDate": "2020-06-11",
+                  "valueDate": "2020-06-10",
+                  "actionDate": "2020-06-18",
+                  "amount": 31.09
+                }
+              ]
+            }
+          }.to_json
+        )
+    end
+
     let(:account) do
       InvestecOpenApi::Models::Account.from_api({
           "accountId" => "12345",
@@ -99,9 +158,18 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         })
     end
 
-    it "finds all transactions that match an account" do
+    it "calls the api for all transactions that match an account" do
       expect_any_instance_of(InvestecOpenApi::Client).to receive(:transactions).with(account.id)
       described_class.where(account_id: account.id)
+    end
+
+    context "when the api request is valid" do
+      it "returns all transactions that match an account" do
+        account_transactions = described_class.where(account_id: account.id)
+        expect(account_transactions).to be_an_instance_of(Array)
+        expect(account_transactions.first).to be_an_instance_of(described_class)
+        expect(account_transactions.map{ |t| t.account_id }.uniq).to eql([account.id])
+      end
     end
 
     context "when an account_id is not specified" do

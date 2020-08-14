@@ -8,6 +8,7 @@ module InvestecOpenApi::Models
     @@client = -> do
       client = InvestecOpenApi::Client.new
       client.authenticate!
+      client
     end
 
     def self.client

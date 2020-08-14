@@ -25,10 +25,10 @@ module InvestecOpenApi::Models
     end
 
     def self.find(id)
-      raise InvestecOpenApi::MethodNotImplementedError, ".find needs to be implemented"
-      # Options
-      # - client.accounts
-      # - from_api('accountId' => id)
+      account = all.find { |acc| acc.id == id }
+      raise InvestecOpenApi::NotFoundError unless account.present?
+
+      account
     end
 
     def self.all
