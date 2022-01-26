@@ -8,8 +8,6 @@ RSpec.describe InvestecOpenApi::Client do
 
   before do
 
-    #WebMock.allow_net_connect!(allow_localhost: true)
-
     InvestecOpenApi.api_url = "https://openapistg.investec.com/"
     InvestecOpenApi.api_username = "Test"
     InvestecOpenApi.api_password = "Secret"
@@ -92,6 +90,7 @@ RSpec.describe InvestecOpenApi::Client do
            headers: {
           'Accept'=>'application/json',
           'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          "Authorization" => "Bearer 123",
           'User-Agent'=>'Faraday v1.9.3'
         })
         .to_return(
