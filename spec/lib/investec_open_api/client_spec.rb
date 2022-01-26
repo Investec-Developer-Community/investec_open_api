@@ -7,6 +7,9 @@ RSpec.describe InvestecOpenApi::Client do
   let(:client) { InvestecOpenApi::Client.new }
 
   before do
+
+    #WebMock.allow_net_connect!(allow_localhost: true)
+
     InvestecOpenApi.api_url = "https://openapistg.investec.com/"
     InvestecOpenApi.api_username = "Test"
     InvestecOpenApi.api_password = "Secret"
@@ -17,8 +20,8 @@ RSpec.describe InvestecOpenApi::Client do
         headers: {
           "Accept" => "application/json",
           "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-          "Authorization" => Faraday::Connection.new.basic_auth("Test", "Secret"),
-          "User-Agent" => "Faraday v1.0.1"
+          "Authorization" => "Basic VGVzdDpTZWNyZXQ=",
+          "User-Agent" => "Faraday v1.9.3"
         }
       )
       .to_return(body: { "access_token" => "123","token_type" => "Bearer", "expires_in" => 1799, "scope" =>"accounts" }.to_json)
@@ -33,7 +36,7 @@ RSpec.describe InvestecOpenApi::Client do
             "Accept" => "application/json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v1.0.1"
+            "User-Agent" => "Faraday v1.9.3"
           }
         )
         .to_return(
@@ -63,6 +66,7 @@ RSpec.describe InvestecOpenApi::Client do
     end
 
     it "returns all accounts for the authorized user as InvestecOpenApi::Models::Account instances" do
+
       accounts = client.accounts
 
       expect(accounts.first).to be_an_instance_of(InvestecOpenApi::Models::Account)
@@ -83,16 +87,13 @@ RSpec.describe InvestecOpenApi::Client do
  
   describe "#transactions" do
     before do
-      stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/12345/transactions")
-        .with(
-          body: "",
-          headers: {
-            "Accept" => "application/json",
-            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-            "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v1.0.1"
-          }
-        )
+      stub_request(:get, "https://openapistg.investec.com/za/pb/v1/accounts/12345/transactions").
+         with(
+           headers: {
+          'Accept'=>'application/json',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Faraday v1.9.3'
+        })
         .to_return(
           body: {
             data: {
