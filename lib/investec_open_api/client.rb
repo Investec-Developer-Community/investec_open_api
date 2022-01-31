@@ -22,6 +22,21 @@ class InvestecOpenApi::Client
     end
   end
 
+  def create_transfer(amount, source_account_id, destination_account_id, source_reference, destination_reference=nil)
+    transfer = InvestecOpenApi::Models::Transfer.new(
+      amount:                 amount,
+      destination_account_id: destination_account_id,
+      source_account_id:      source_account_id,
+      source_reference:       source_reference,
+      destination_reference:  destination_reference || source_reference
+    )
+    response = connection.post('/za/pb/v1/accounts/transfermultiple') do |request|
+      request.body = transfer.request_template.to_json
+    end
+
+    transfer.update_from_api(response.body['data']['transferResponse'])
+  end
+
   private
 
   def get_oauth_token
