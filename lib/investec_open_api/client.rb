@@ -1,8 +1,8 @@
 require "faraday"
 require "faraday_middleware"
-require_relative "models/account"
-require_relative "models/transaction"
-require_relative "models/transfer"
+require "investec_open_api/models/account"
+require "investec_open_api/models/transaction"
+require "investec_open_api/models/transfer"
 
 class InvestecOpenApi::Client
   def authenticate!
