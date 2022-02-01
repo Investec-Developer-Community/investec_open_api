@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/investec_open_api.svg)](https://badge.fury.io/rb/investec_open_api)
 [![Build Status](https://travis-ci.com/Offerzen/investec_open_api.svg?branch=master)](https://travis-ci.com/Offerzen/investec_open_api)
 
-A simple client wrapper for the [Investec Open API](https://developer.investec.com/programmable-banking/#open-api). 
+A simple client wrapper for the [Investec Open API](https://developer.investec.com/programmable-banking/#open-api).
 
 *Features:*
 
@@ -64,6 +64,12 @@ Use the ID of one of your accounts to retrieve transactions:
 
 ```ruby
 client.transactions(my_account.id)
+```
+
+Use the ID of two accounts to create a transfer:
+
+```
+client.create_transfer(500, source_account.id, destination_account.id, source_reference, destination_reference)
 ```
 
 ## License
