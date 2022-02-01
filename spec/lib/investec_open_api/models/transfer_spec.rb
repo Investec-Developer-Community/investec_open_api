@@ -31,6 +31,41 @@ RSpec.describe InvestecOpenApi::Models::Transfer do
       expect(empty_transfer.payment_reference_number).to  eq("ABC123456")
       expect(empty_transfer.status).to                    eq("- Payment/Transfer effective date #{date_string}")
     end
+  end
 
+  describe '#request_template' do
+    let(:amount)                  { 500 }
+    let(:destination_account_id)  { 'destination_account_id' }
+    let(:source_account_id)       { 'source_account_id' }
+    let(:reference)               { 'A sample reference' }
+    let(:destination_reference)   { 'A different reference' }
+
+    let(:sample_transfer) do
+      InvestecOpenApi::Models::Transfer.new(
+        amount:                 amount,
+        destination_account_id: destination_account_id,
+        source_account_id:      source_account_id,
+        reference:              reference,
+        destination_reference:  destination_reference
+      )
+    end
+
+    let(:expected_template) do
+      {
+        AccountId: source_account_id,
+        TransferList: [
+          {
+            BeneficiaryAccountId: destination_account_id,
+            Amount: amount,
+            MyReference: reference,
+            TheirReference: destination_reference
+          }
+        ]
+      }
+    end
+
+    it "populates the template correctly" do
+      expect(sample_transfer.request_template).to eq(expected_template)
+    end
   end
 end
