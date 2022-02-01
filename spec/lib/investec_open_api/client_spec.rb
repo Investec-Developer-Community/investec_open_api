@@ -80,7 +80,7 @@ RSpec.describe InvestecOpenApi::Client do
       expect(accounts.last.product_name).to eq "Private Savings Account"
     end
   end
- 
+
   describe "#transactions" do
     before do
       stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/12345/transactions")
@@ -131,6 +131,133 @@ RSpec.describe InvestecOpenApi::Client do
       transactions = client.transactions("12345")
 
       expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+    end
+  end
+
+  describe "#create_transfer" do
+    let(:amount)                  { 500 }
+    let(:destination_account_id)  { 'destination_account_id' }
+    let(:source_account_id)       { 'source_account_id' }
+    let(:reference)               { 'A sample reference' }
+    let(:destination_reference)   { 'A different reference' }
+    let(:date_string)             { DateTime.current.strftime('%m/%d/%Y') }
+
+    let(:sample_transfer) do
+      InvestecOpenApi::Models::Transfer.new(
+        amount:                 amount,
+        destination_account_id: destination_account_id,
+        source_account_id:      source_account_id,
+        reference:              reference,
+        destination_reference:  destination_reference
+      )
+    end
+
+    let(:response) do
+      {
+        body: {
+          "data": {
+            "transferResponse": {
+              "TransferResponses": [
+                {
+                  "PaymentReferenceNumber": "ABC123456",
+                  "PaymentDate": date_string,
+                  "Status": "- Payment/Transfer effective date #{date_string}",
+                  "BeneficiaryName": "Test",
+                  "BeneficiaryAccountId": "12345678",
+                  "AuthorisationRequired": false
+                }
+              ],
+              "ErrorMessage": nil
+            }
+          }
+        }.to_json
+      }
+    end
+
+    before do
+      stub_request(:post, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/transfermultiple").with(
+        body: sample_transfer.request_template.to_json,
+        headers: {
+          "Accept" => "application/json",
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "Authorization" => "Bearer 123",
+          "User-Agent" => "Faraday v1.0.1"
+        }
+      )
+      .to_return(
+        response
+      )
+
+      sample_transfer.destination_reference = reference
+      stub_request(:post, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/transfermultiple").with(
+        body: sample_transfer.request_template.to_json,
+        headers: {
+          "Accept" => "application/json",
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "Authorization" => "Bearer 123",
+          "User-Agent" => "Faraday v1.0.1"
+        }
+      )
+      .to_return(
+        response
+      )
+
+      client.authenticate!
+    end
+
+    it "creates the transfer and populates the InvestecOpenApi::Models::Transaction instance" do
+      transfer = client.create_transfer(
+        amount,
+        source_account_id,
+        destination_account_id,
+        reference,
+        destination_reference
+      )
+
+      expect(transfer).to be_an_instance_of(InvestecOpenApi::Models::Transfer)
+      expect(transfer.status).to eq("- Payment/Transfer effective date #{date_string}")
+    end
+
+    it "defaults the destination reference to the source reference if not provided" do
+      transfer = client.create_transfer(
+        amount,
+        source_account_id,
+        destination_account_id,
+        reference
+      )
+
+      expect(transfer.destination_reference).to eq(reference)
+    end
+
+    context 'when an error is triggered' do
+      let(:response) do
+        {
+          body: {
+            "data": {
+              "transferResponse": {
+                "TransferResponses": [
+                  {}
+                ],
+                "ErrorMessage": "Insufficient Funds"
+              }
+            }
+          }.to_json
+        }
+      end
+
+      it "populates the error field" do
+        transfer = client.create_transfer(
+          amount,
+          source_account_id,
+          destination_account_id,
+          reference,
+          destination_reference
+        )
+
+        expect(transfer.error_message).to eq("Insufficient Funds")
+      end
+
+
     end
   end
 end

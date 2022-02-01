@@ -8,26 +8,18 @@ module InvestecOpenApi::Models
       new(underscored_params(params))
     end
 
-    def self.update_from_api(params = {})
-      assign_attributes(underscored_params(params))
+    def assign_from_api(params = {})
+      self.assign_attributes(self.class.underscored_params(params))
+      self
     end
 
     private
 
-    def underscored_params(params)
+    def self.underscored_params(params)
       params.deep_transform_keys do |key|
         key.underscore.to_sym
       end
     end
 
-    def assign_attributes(attributes)
-      attributes.each do |key, value|
-        raise ActiveAttr::UnknownAttributeError unless defined?(key)
-
-        self.send("#{key}=", value)
-      end
-
-      self
-    end
   end
 end

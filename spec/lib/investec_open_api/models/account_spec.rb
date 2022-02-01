@@ -12,7 +12,7 @@ RSpec.describe InvestecOpenApi::Models::Account do
           "referenceName" => "Savings Account",
           "productName" => "Private Bank Account"
         })
-  
+
         expect(model_instance.id).to eq "12345"
         expect(model_instance.number).to eq "67890"
         expect(model_instance.name).to eq "Test User"

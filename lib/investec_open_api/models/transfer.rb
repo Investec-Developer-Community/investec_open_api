@@ -11,6 +11,14 @@ module InvestecOpenApi::Models
     attribute :payment_reference_number
     attribute :payment_date
     attribute :error_message
+    attribute :beneficiary_name
+    attribute :beneficiary_account_id
+
+    def assign_from_api(params = {})
+      params = params["TransferResponses"].first.merge({'ErrorMessage' => params['ErrorMessage']})
+
+      super(params)
+    end
 
     def request_template
       {

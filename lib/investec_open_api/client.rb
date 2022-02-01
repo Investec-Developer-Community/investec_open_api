@@ -1,7 +1,8 @@
 require "faraday"
 require "faraday_middleware"
-require "investec_open_api/models/account"
-require "investec_open_api/models/transaction"
+require_relative "models/account"
+require_relative "models/transaction"
+require_relative "models/transfer"
 
 class InvestecOpenApi::Client
   def authenticate!
@@ -27,14 +28,16 @@ class InvestecOpenApi::Client
       amount:                 amount,
       destination_account_id: destination_account_id,
       source_account_id:      source_account_id,
-      source_reference:       source_reference,
+      reference:              source_reference,
       destination_reference:  destination_reference || source_reference
     )
-    response = connection.post('/za/pb/v1/accounts/transfermultiple') do |request|
+
+    response = connection.post('za/pb/v1/accounts/transfermultiple') do |request|
       request.body = transfer.request_template.to_json
     end
 
-    transfer.update_from_api(response.body['data']['transferResponse'])
+    transfer.assign_from_api(response.body['data']['transferResponse'])
+    transfer
   end
 
   private
