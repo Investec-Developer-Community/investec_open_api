@@ -207,11 +207,11 @@ RSpec.describe InvestecOpenApi::Client do
 
     it "creates the transfer and populates the InvestecOpenApi::Models::Transaction instance" do
       transfer = client.create_transfer(
-        amount,
-        source_account_id,
-        destination_account_id,
-        reference,
-        destination_reference
+        amount: amount,
+        source_account_id: source_account_id,
+        destination_account_id: destination_account_id,
+        source_reference: reference,
+        destination_reference: destination_reference
       )
 
       expect(transfer).to be_an_instance_of(InvestecOpenApi::Models::Transfer)
@@ -220,10 +220,10 @@ RSpec.describe InvestecOpenApi::Client do
 
     it "defaults the destination reference to the source reference if not provided" do
       transfer = client.create_transfer(
-        amount,
-        source_account_id,
-        destination_account_id,
-        reference
+        amount: amount,
+        source_account_id: source_account_id,
+        destination_account_id: destination_account_id,
+        source_reference: reference
       )
 
       expect(transfer.destination_reference).to eq(reference)
@@ -247,11 +247,11 @@ RSpec.describe InvestecOpenApi::Client do
 
       it "populates the error field" do
         transfer = client.create_transfer(
-          amount,
-          source_account_id,
-          destination_account_id,
-          reference,
-          destination_reference
+          amount: amount,
+          source_account_id: source_account_id,
+          destination_account_id: destination_account_id,
+          source_reference: reference,
+          destination_reference: destination_reference
         )
 
         expect(transfer.error_message).to eq("Insufficient Funds")

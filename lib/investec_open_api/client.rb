@@ -23,7 +23,7 @@ class InvestecOpenApi::Client
     end
   end
 
-  def create_transfer(amount:, source_account_id:, destination_account_id:, source_reference:, destination_reference:=nil)
+  def create_transfer(amount:, source_account_id:, destination_account_id:, source_reference:, destination_reference: nil)
     transfer = InvestecOpenApi::Models::Transfer.new(
       amount:                 amount,
       destination_account_id: destination_account_id,
