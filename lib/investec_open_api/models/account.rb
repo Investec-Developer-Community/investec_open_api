@@ -24,11 +24,4 @@ module InvestecOpenApi::Models
       super
     end
   end
-
-  def balance
-    response = connection.get("za/pb/v1/accounts#{self.id}/balance")
-
-    self.available_balance  = Money.new(response.body["data"]["availableBalance"], "ZAR")
-    self.current_balance    = Money.new(response.body["data"]["currentBalance"], "ZAR")
-  end
 end

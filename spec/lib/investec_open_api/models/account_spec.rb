@@ -38,34 +38,4 @@ RSpec.describe InvestecOpenApi::Models::Account do
       end
     end
   end
-
-  describe "#balance" do
-    let(:response) do
-      {
-        "data" => {
-          "accountId" => "123456",
-          "currentBalance" => 90.0,
-          "availableBalance" => 100.0,
-          "currency" => "ZAR"
-        }
-      }
-    end
-
-    before do
-      stub_request(:post, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/123456/balance").with(
-        body: '',
-        headers: {
-          "Accept" => "application/json",
-          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-          "Authorization" => "Bearer 123",
-          "User-Agent" => "Faraday v1.0.1"
-        }
-      )
-      .to_return(
-        response
-      )
-    end
-
-
-  end
 end

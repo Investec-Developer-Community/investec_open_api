@@ -260,4 +260,41 @@ RSpec.describe InvestecOpenApi::Client do
 
     end
   end
+
+  describe "#balance" do
+    let(:response) do
+      {
+        body: {
+          "data" => {
+            "accountId" => "123456",
+            "currentBalance" => 90.0,
+            "availableBalance" => 100.0,
+            "currency" => "ZAR"
+          }
+        }.to_json
+      }
+    end
+
+    before do
+      stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/123456/balance").with(
+        headers: {
+          "Accept" => "application/json",
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "Authorization" => "Bearer 123",
+          "User-Agent" => "Faraday v1.0.1"
+        }
+      )
+      .to_return(
+        response
+      )
+
+      client.authenticate!
+    end
+
+    it 'retrieves the balances' do
+      expect(client.balance('123456')).to eq(Money.new(100, 'ZAR'))
+      expect(client.balance('123456', balance_type: :current)).to eq(Money.new(90, 'ZAR'))
+    end
+
+  end
 end

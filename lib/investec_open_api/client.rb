@@ -16,6 +16,12 @@ class InvestecOpenApi::Client
     end
   end
 
+  def balance(account_id, balance_type: :available) 
+    response = connection.get("za/pb/v1/accounts/#{account_id}/balance")
+
+    Money.new(response.body["data"]["#{balance_type}Balance"], "ZAR")
+  end
+
   def transactions(account_id)
     response = connection.get("za/pb/v1/accounts/#{account_id}/transactions")
     response.body["data"]["transactions"].map do |transaction_raw|
