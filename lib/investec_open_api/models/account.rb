@@ -5,8 +5,6 @@ module InvestecOpenApi::Models
     attribute :name
     attribute :reference_name
     attribute :product_name
-    attribute :available_balance
-    attribute :current_balance
 
     def self.from_api(params = {})
       if params['accountId'].present?
