@@ -19,7 +19,7 @@ class InvestecOpenApi::Client
   def balance(account_id, balance_type: :available) 
     response = connection.get("za/pb/v1/accounts/#{account_id}/balance")
 
-    Money.new(response.body["data"]["#{balance_type}Balance"], "ZAR")
+    Money.from_amount(response.body["data"]["#{balance_type}Balance"], "ZAR")
   end
 
   def transactions(account_id)
