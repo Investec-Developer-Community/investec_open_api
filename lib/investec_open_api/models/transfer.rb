@@ -15,7 +15,8 @@ module InvestecOpenApi::Models
     attribute :beneficiary_account_id
 
     def assign_from_api(params = {})
-      params = params["TransferResponses"].first.merge({'ErrorMessage' => params['ErrorMessage']})
+      params["TransferResponses"]&.first&.merge!({'ErrorMessage' => params['ErrorMessage']})
+      params["TransferResponses"] ||= {'ErrorMessage' => params['ErrorMessage']}
 
       super(params)
     end
