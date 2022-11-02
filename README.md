@@ -35,9 +35,9 @@ Create a new initializer called `investec_open_api.rb` in `config/initializers`:
 
 ```ruby
 InvestecOpenApi.configuration do |config|
-    config.api_username = "https://openapi.investec.com/"
-    config.api_password = "<Open API username>"
-    config.api_url = "<Open API password>"
+    config.api_url = "https://openapi.investec.com/"
+    config.api_username = "<Open API username>"
+    config.api_password = "<Open API password>"
 end
 ```
 
