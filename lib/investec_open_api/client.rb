@@ -4,6 +4,8 @@ require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
 
 class InvestecOpenApi::Client
+  INVESTEC_API_URL="https://openapi.investec.com/"
+
   def authenticate!
     @token = get_oauth_token["access_token"]
   end
@@ -25,24 +27,22 @@ class InvestecOpenApi::Client
   private
 
   def get_oauth_token
-    auth_connection = Faraday.new(url: InvestecOpenApi.api_url) do |builder|
-      builder.headers["Accept"] = "application/json"
-      builder.basic_auth(InvestecOpenApi.api_username, InvestecOpenApi.api_password)
-      builder.response :raise_error
-      builder.response :json
-      builder.adapter Faraday.default_adapter
-    end
+    auth_token = Base64.strict_encode64("#{InvestecOpenApi.client_id}:#{InvestecOpenApi.client_secret}")
 
-    response = auth_connection.post("identity/v2/oauth2/token", {
-      grant_type: "client_credentials",
-      scope: "accounts"
-    }.to_query)
+    response = Faraday.post(
+      "#{INVESTEC_API_URL}identity/v2/oauth2/token",
+      { grant_type: "client_credentials" },
+      {
+        'x-api-key' => InvestecOpenApi.api_key,
+        'Authorization' => "Basic #{auth_token}"
+      }
+    )
 
-    response.body
+    JSON.parse(response.body)
   end
 
   def connection
-    @_connection ||= Faraday.new(url: InvestecOpenApi.api_url) do |builder|
+    @_connection ||= Faraday.new(url: INVESTEC_API_URL) do |builder|
       if @token
         builder.headers["Authorization"] = "Bearer #{@token}"
       end

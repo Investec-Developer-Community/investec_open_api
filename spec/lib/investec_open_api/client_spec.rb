@@ -4,36 +4,43 @@ require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
 
 RSpec.describe InvestecOpenApi::Client do
-  let(:client) { InvestecOpenApi::Client.new }
+  let(:client)  { InvestecOpenApi::Client.new }
+  let(:api_url) { 'https://openapi.investec.com/' }
 
   before do
-    InvestecOpenApi.api_url = "https://openapistg.investec.com/"
-    InvestecOpenApi.api_username = "Test"
-    InvestecOpenApi.api_password = "Secret"
+    InvestecOpenApi.api_key       = "TESTKEY"
+    InvestecOpenApi.client_id     = "Test"
+    InvestecOpenApi.client_secret = "Secret"
 
-    stub_request(:post, "#{InvestecOpenApi.api_url}identity/v2/oauth2/token")
+    stub_request(:post, "#{api_url}identity/v2/oauth2/token")
       .with(
-        body: "grant_type=client_credentials&scope=accounts",
-        headers: {
-          "Accept" => "application/json",
-          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-          "Authorization" => Faraday::Connection.new.basic_auth("Test", "Secret"),
-          "User-Agent" => "Faraday v1.0.1"
-        }
-      )
-      .to_return(body: { "access_token" => "123","token_type" => "Bearer", "expires_in" => 1799, "scope" =>"accounts" }.to_json)
+          body: {"grant_type"=>"client_credentials"},
+          headers: {
+            'Accept'=>'*/*',
+            'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+            'Authorization'=>'Basic VGVzdDpTZWNyZXQ=',
+            'Content-Type'=>'application/x-www-form-urlencoded',
+            'User-Agent'=>'Faraday v1.10.3',
+            'X-Api-Key'=>'TESTKEY'
+          })
+      .to_return(status: 200, body: {
+              "access_token": "123",
+              "token_type": "Bearer",
+              "expires_in": 1799,
+              "scope": "accounts"
+          }.to_json, headers: {})
   end
 
   describe "#accounts" do
     before do
-      stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts")
+      stub_request(:get, "#{api_url}za/pb/v1/accounts")
         .with(
           body: "",
           headers: {
             "Accept" => "application/json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v1.0.1"
+            "User-Agent" => "Faraday v1.10.3"
           }
         )
         .to_return(
@@ -80,17 +87,17 @@ RSpec.describe InvestecOpenApi::Client do
       expect(accounts.last.product_name).to eq "Private Savings Account"
     end
   end
- 
+
   describe "#transactions" do
     before do
-      stub_request(:get, "#{InvestecOpenApi.api_url}za/pb/v1/accounts/12345/transactions")
+      stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions")
         .with(
           body: "",
           headers: {
             "Accept" => "application/json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v1.0.1"
+            "User-Agent" => "Faraday v1.10.3"
           }
         )
         .to_return(
