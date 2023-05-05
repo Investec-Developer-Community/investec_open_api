@@ -3,12 +3,12 @@ require_relative 'lib/investec_open_api/version'
 Gem::Specification.new do |spec|
   spec.name          = "investec_open_api"
   spec.version       = InvestecOpenApi::VERSION
-  spec.authors       = ["Markus Kuhn", "Jethro Flanagan"]
-  spec.email         = ["mkk0856@gmail.com", "jethroflanagan@gmail.com"]
+  spec.authors       = ["Community Core Team"]
+  spec.email         = ["community@make.dev"]
 
   spec.summary       = %q{Investec Open API Wrapper}
   spec.description   = %q{A small wrapper client for accessing Investec's Open API}
-  spec.homepage      = "https://github.com/offerzen/investec_open_api"
+  spec.homepage      = "https://github.com/programmable-banking-community/investec_open_api"
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
@@ -26,4 +26,15 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+
+  # add runtime dependencies
+  spec.add_runtime_dependency 'active_attr'
+  spec.add_runtime_dependency 'faraday'
+  spec.add_runtime_dependency 'faraday_middleware'
+  spec.add_runtime_dependency 'money'
+
+  # add development dependencies
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'webmock'
 end
