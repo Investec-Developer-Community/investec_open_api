@@ -1,9 +1,8 @@
 # InvestecOpenApi Client
 
 [![Gem Version](https://badge.fury.io/rb/investec_open_api.svg)](https://badge.fury.io/rb/investec_open_api)
-[![Build Status](https://travis-ci.com/Offerzen/investec_open_api.svg?branch=master)](https://travis-ci.com/Offerzen/investec_open_api)
 
-A simple client wrapper for the [Investec Open API](https://developer.investec.com/programmable-banking/#open-api).
+A simple client wrapper for the [Investec Open API](https://developer.investec.com/za/api-products).
 
 *Features:*
 
@@ -35,8 +34,8 @@ Create a new initializer called `investec_open_api.rb` in `config/initializers`:
 
 ```ruby
 InvestecOpenApi.configuration do |config|
-    config.api_key      = ENV['API_KEY']
-    config.client_id    = ENV['CLIENT_ID']
+    config.api_key       = ENV['API_KEY']
+    config.client_id     = ENV['CLIENT_ID']
     config.client_secret = ENV['CLIENT_SECRET']
 end
 ```
