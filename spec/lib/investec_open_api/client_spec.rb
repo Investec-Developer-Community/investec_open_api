@@ -143,7 +143,7 @@ RSpec.describe InvestecOpenApi::Client do
 
   describe "#transfer" do
     before do
-      stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transfermultiple")
+      stub_request(:post, "#{api_url}za/pb/v1/accounts/12345/transfermultiple")
         .with(
           body: {
             transferList: [
@@ -183,9 +183,9 @@ RSpec.describe InvestecOpenApi::Client do
     end
 
     it "returns transfer details based on the transfer as InvestecOpenApi::Models::Transfer instances" do
-      transferResponses = client.transfer('12345', '6789', 10, 'API Transfer', 'API Transfer')
+      transferResponses = client.transfer('12345', '6789', 10, 'Library Transfer', 'Library Transfer')
 
-      expect(transferResponses.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+      expect(transferResponses.first).to be_an_instance_of(InvestecOpenApi::Models::Transfer)
     end
   end
 end

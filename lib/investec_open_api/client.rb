@@ -2,6 +2,7 @@ require "faraday"
 require "faraday_middleware"
 require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
+require "investec_open_api/models/transfer"
 
 class InvestecOpenApi::Client
   INVESTEC_API_URL="https://openapi.investec.com/"
