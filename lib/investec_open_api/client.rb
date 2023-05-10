@@ -24,6 +24,26 @@ class InvestecOpenApi::Client
     end
   end
 
+  def transfer(account_id, to_account_id, amount, my_reference, their_reference)
+    response = connection.post(
+      "za/pb/v1/accounts/#{account_id}/transfermultiple",
+       {
+          transferList: [
+          {
+            beneficiaryAccountId: to_account_id,
+            amount: amount,
+            myReference: my_reference,
+            theirReference: their_reference
+          }
+        ]
+      }
+    )
+
+    response.body["data"]["TransferResponses"].map do |transfer_raw|
+      InvestecOpenApi::Models::Transfer.from_api(transfer_raw)
+    end
+  end
+
   private
 
   def get_oauth_token

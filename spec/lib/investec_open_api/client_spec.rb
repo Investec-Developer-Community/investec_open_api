@@ -140,4 +140,52 @@ RSpec.describe InvestecOpenApi::Client do
       expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
     end
   end
+
+  describe "#transfer" do
+    before do
+      stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transfermultiple")
+        .with(
+          body: {
+            transferList: [
+              {
+                beneficiaryAccountId: '6789',
+                amount: 10,
+                myReference: 'Library Transfer',
+                theirReference: 'Library Transfer'
+              }
+            ]
+          },
+          headers: {
+            "Accept" => "application/json",
+            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "Authorization" => "Bearer 123",
+            "User-Agent" => "Faraday v1.10.3"
+          }
+        )
+        .to_return(
+          body: {
+            data: {
+              "TransferResponses": [
+                {
+                  "PaymentReferenceNumber": "UBP0111111111",
+                  "PaymentDate": "10/05/2023",
+                  "Status": "- No authorisation necessary <BR>- Payment/Transfer effective date 10/05/2023",
+                  "BeneficiaryName": "API transfer",
+                  "BeneficiaryAccountId": "6789",
+                  "AuthorisationRequired": false
+                }
+              ]
+            }
+          }.to_json
+        )
+
+      client.authenticate!
+    end
+
+    it "returns transfer details based on the transfer as InvestecOpenApi::Models::Transfer instances" do
+      transferResponses = client.transfer('12345', '6789', 10, 'API Transfer', 'API Transfer')
+
+      expect(transferResponses.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+    end
+  end
 end
