@@ -10,7 +10,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
           "type" => "DEBIT",
           "status" => "POSTED",
           "cardNumber" => "400000xxxxxx0001",
-          "amount" => 50000,
+          "amount" => 50000.32,
           "description" => "COFFEE",
           "transactionDate" => "2020-07-13",
           "postingDate" => "2020-07-14",
@@ -23,7 +23,8 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         expect(model_instance.status).to eq "POSTED"
         expect(model_instance.card_number).to eq "400000xxxxxx0001"
         expect(model_instance.amount.class).to eq Money
-        expect(model_instance.amount.to_f).to eq -50000.0
+        expect(model_instance.amount.to_f).to eq -50000.32
+        expect(model_instance.amount.format).to eq "R-50,000.32"
         expect(model_instance.description).to eq "COFFEE"
         expect(model_instance.date).to eq Date.parse("2020-07-13")
         expect(model_instance.posting_date).to eq Date.parse("2020-07-14")

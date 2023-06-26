@@ -27,7 +27,10 @@ module InvestecOpenApi::Models
       if params['amount'].present?
         adjusted_amount = params['amount'] * 100
         adjusted_amount = -adjusted_amount if params['type'] == 'DEBIT'
-        params['amount'] = Money.new(adjusted_amount, "ZAR")
+        
+        Money.rounding_mode = BigDecimal::ROUND_HALF_UP
+        Money.locale_backend = :i18n
+        params['amount'] = Money.from_cents(adjusted_amount, "ZAR")
       end
 
       if params['transactionDate']
