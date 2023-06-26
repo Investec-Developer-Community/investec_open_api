@@ -89,55 +89,76 @@ RSpec.describe InvestecOpenApi::Client do
   end
 
   describe "#transactions" do
-    before do
-      stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions")
-        .with(
-          body: "",
-          headers: {
-            "Accept" => "application/json",
-            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-            "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v1.10.3"
-          }
-        )
-        .to_return(
-          body: {
-            data: {
-              transactions: [
-                {
-                  "accountId": "12345",
-                  "type": "DEBIT",
-                  "status": "POSTED",
-                  "description": "MONTHLY SERVICE CHARGE",
-                  "cardNumber": "",
-                  "postingDate": "2020-06-11",
-                  "valueDate": "2020-06-10",
-                  "actionDate": "2020-06-18",
-                  "amount": 535
-                },
-                {
-                  "accountId": "12345",
-                  "type": "CREDIT",
-                  "status": "POSTED",
-                  "description": "CREDIT INTEREST",
-                  "cardNumber": "",
-                  "postingDate": "2020-06-11",
-                  "valueDate": "2020-06-10",
-                  "actionDate": "2020-06-18",
-                  "amount": 31.09
-                }
-              ]
+    let(:transaction_data) do
+      {
+        data: {
+          transactions: [
+            {
+              "accountId": "12345",
+              "type": "DEBIT",
+              "status": "POSTED",
+              "description": "MONTHLY SERVICE CHARGE",
+              "cardNumber": "",
+              "postingDate": "2020-06-11",
+              "valueDate": "2020-06-10",
+              "actionDate": "2020-06-18",
+              "amount": 535
+            },
+            {
+              "accountId": "12345",
+              "type": "CREDIT",
+              "status": "POSTED",
+              "description": "CREDIT INTEREST",
+              "cardNumber": "",
+              "postingDate": "2020-06-11",
+              "valueDate": "2020-06-10",
+              "actionDate": "2020-06-18",
+              "amount": 31.09
             }
-          }.to_json
-        )
-
+          ]
+        }
+      }.to_json
+    end
+  
+    let(:headers) do
+      {
+        "Accept" => "application/json",
+        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "Authorization" => "Bearer 123",
+        "User-Agent" => "Faraday v1.10.3"
+      }
+    end
+  
+    before do
       client.authenticate!
     end
-
-    it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
-      transactions = client.transactions("12345")
-
-      expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+  
+    context "when no filter parameters are specified" do
+      before do
+        stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions")
+          .with(body: "", headers: headers)
+          .to_return(body: transaction_data)
+      end
+  
+      it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
+        transactions = client.transactions("12345")
+        expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+      end
     end
+  
+    context "when filter parameters are specified" do
+      let(:options) { {from_date: "2021-01-01", to_date: "2023-01-01", page: 4} }
+  
+      before do
+        stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions?fromDate=2021-01-01&toDate=2023-01-01&page=4")
+          .with(body: "", headers: headers)
+          .to_return(body: transaction_data)
+      end
+  
+      it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
+        transactions = client.transactions("12345", options)
+        expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+      end
+    end  
   end
 end
