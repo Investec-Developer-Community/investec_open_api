@@ -65,9 +65,4 @@ class InvestecOpenApi::Client
       builder.adapter Faraday.default_adapter
     end
   end
-
-  def camelize(snake_string)
-    words = snake_string.split('_')
-    words.drop(1).collect(&:capitalize).unshift(words.first).join
-  end
 end
