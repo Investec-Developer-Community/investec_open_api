@@ -99,6 +99,7 @@ RSpec.describe InvestecOpenApi::Client do
               "status": "POSTED",
               "description": "MONTHLY SERVICE CHARGE",
               "cardNumber": "",
+              "postingOrder": 1,
               "postingDate": "2020-06-11",
               "valueDate": "2020-06-10",
               "actionDate": "2020-06-18",
@@ -110,6 +111,7 @@ RSpec.describe InvestecOpenApi::Client do
               "status": "POSTED",
               "description": "CREDIT INTEREST",
               "cardNumber": "",
+              "postingOrder": 2,
               "postingDate": "2020-06-11",
               "valueDate": "2020-06-10",
               "actionDate": "2020-06-18",
@@ -119,7 +121,7 @@ RSpec.describe InvestecOpenApi::Client do
         }
       }.to_json
     end
-  
+
     let(:headers) do
       {
         "Accept" => "application/json",
@@ -128,37 +130,37 @@ RSpec.describe InvestecOpenApi::Client do
         "User-Agent" => "Faraday v1.10.3"
       }
     end
-  
+
     before do
       client.authenticate!
     end
-  
+
     context "when no filter parameters are specified" do
       before do
         stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions")
           .with(body: "", headers: headers)
           .to_return(body: transaction_data)
       end
-  
+
       it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
         transactions = client.transactions("12345")
         expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
       end
     end
-  
+
     context "when filter parameters are specified" do
       let(:options) { {from_date: "2021-01-01", to_date: "2023-01-01", page: 4} }
-  
+
       before do
         stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions?fromDate=2021-01-01&toDate=2023-01-01&page=4")
           .with(body: "", headers: headers)
           .to_return(body: transaction_data)
       end
-  
+
       it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
         transactions = client.transactions("12345", options)
         expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
       end
-    end  
+    end
   end
 end

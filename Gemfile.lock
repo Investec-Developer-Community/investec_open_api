@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    investec_open_api (1.1.0)
+    investec_open_api (1.1.1)
       active_attr
       faraday
       faraday_middleware
