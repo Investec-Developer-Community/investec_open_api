@@ -2,8 +2,10 @@ require "faraday"
 require "faraday_middleware"
 require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
+require "investec_open_api/camel_case_refinement"
 
 class InvestecOpenApi::Client
+  using InvestecOpenApi::CamelCaseRefinement
   INVESTEC_API_URL="https://openapi.investec.com/"
 
   def authenticate!
@@ -17,8 +19,15 @@ class InvestecOpenApi::Client
     end
   end
 
-  def transactions(account_id)
-    response = connection.get("za/pb/v1/accounts/#{account_id}/transactions")
+  def transactions(account_id, options = {})
+    endpoint_url = "za/pb/v1/accounts/#{account_id}/transactions"
+
+    unless options.empty?
+      query_string = URI.encode_www_form(options.camelize)
+      endpoint_url += "?#{query_string}"
+    end
+    
+    response = connection.get(endpoint_url)
     response.body["data"]["transactions"].map do |transaction_raw|
       InvestecOpenApi::Models::Transaction.from_api(transaction_raw)
     end
