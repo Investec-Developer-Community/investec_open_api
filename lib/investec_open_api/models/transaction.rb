@@ -3,6 +3,7 @@ require "money"
 module InvestecOpenApi::Models
   class Transaction < Base
     attribute :account_id
+    attribute :posted_order
     attribute :type
     attribute :status
     attribute :card_number
@@ -27,7 +28,7 @@ module InvestecOpenApi::Models
       if params['amount'].present?
         adjusted_amount = params['amount'] * 100
         adjusted_amount = -adjusted_amount if params['type'] == 'DEBIT'
-        
+
         Money.rounding_mode = BigDecimal::ROUND_HALF_UP
         Money.locale_backend = :i18n
         params['amount'] = Money.from_cents(adjusted_amount, "ZAR")
