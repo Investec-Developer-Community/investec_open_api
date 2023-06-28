@@ -13,40 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Specs
 
-    services:
-      postgres:
-        image: postgres
-        ports: ["5432:5432"]
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.1.1
 
-      - name: Install PostgreSQL
-        run: sudo apt-get -yqq install libpq-dev
-
       - name: Run bundle install
         run: |
           gem install bundler
           bundle install --jobs 4 --retry 3
-      - name: Setup Database
-        env:
-          RAILS_ENV: test
-          PGHOST: localhost
-          PGUSER: postgres
-          PGPASSWORD: postgres
-        run: bin/rails db:create db:schema:load
 
       - name: Build and test with rspec
         env:
           RAILS_ENV: test
-          PGHOST: localhost
-          PGUSER: postgres
-          PGPASSWORD: postgres
         run: bundle exec rspec spec
