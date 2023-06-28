@@ -13,6 +13,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
           "amount" => 50000.32,
           "description" => "COFFEE",
           "transactionDate" => "2020-07-13",
+          "postedOrder" => 1,
           "postingDate" => "2020-07-14",
           "valueDate" => "2020-07-15",
           "actionDate" => "2020-07-21"
@@ -28,6 +29,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         expect(model_instance.description).to eq "COFFEE"
         expect(model_instance.date).to eq Date.parse("2020-07-13")
         expect(model_instance.posting_date).to eq Date.parse("2020-07-14")
+        expect(model_instance.posted_order).to eq 1
         expect(model_instance.value_date).to eq Date.parse("2020-07-15")
         expect(model_instance.action_date).to eq Date.parse("2020-07-21")
       end
@@ -59,6 +61,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         "amount" => 50000,
         "description" => "COFFEE ORDER",
         "transactionDate" => "2020-07-13",
+        "postedOrder" => 1,
         "postingDate" => "2020-07-14",
         "valueDate" => "2020-07-15",
         "actionDate" => "2020-07-21"
