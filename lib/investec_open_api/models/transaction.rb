@@ -26,7 +26,7 @@ module InvestecOpenApi::Models
 
     def self.from_api(params)
       if params['amount'].present?
-        adjusted_amount = params['amount']
+        adjusted_amount = params['amount'] * 100
         adjusted_amount = -adjusted_amount if params['type'] == 'DEBIT'
 
         Money.rounding_mode = BigDecimal::ROUND_HALF_UP
