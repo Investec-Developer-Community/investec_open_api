@@ -3,7 +3,7 @@ require "money"
 module InvestecOpenApi::Models
   class Transaction < Base
     attribute :account_id
-    attribute :posting_order
+    attribute :posted_order
     attribute :type
     attribute :status
     attribute :card_number
