@@ -16,7 +16,9 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
           "postedOrder" => 1,
           "postingDate" => "2020-07-14",
           "valueDate" => "2020-07-15",
-          "actionDate" => "2020-07-21"
+          "actionDate" => "2020-07-21",
+          "runningBalance" => 100000.64,
+          "transactionType" => "CardPurchases"
         })
 
         expect(model_instance.account_id).to eq "12345"
@@ -32,6 +34,10 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         expect(model_instance.posted_order).to eq 1
         expect(model_instance.value_date).to eq Date.parse("2020-07-15")
         expect(model_instance.action_date).to eq Date.parse("2020-07-21")
+        expect(model_instance.running_balance.class).to eq Money
+        expect(model_instance.running_balance.to_f).to eq 100000.64
+        expect(model_instance.running_balance.format).to eq "R100,000.64"
+        expect(model_instance.transaction_type).to eq "CardPurchases"
       end
     end
 

@@ -10,7 +10,10 @@ RSpec.describe InvestecOpenApi::Models::Account do
           "accountNumber" => "67890",
           "accountName" => "Test User",
           "referenceName" => "Savings Account",
-          "productName" => "Private Bank Account"
+          "productName" => "Private Bank Account",
+          "kycCompliant" => true,
+          "profileId" => "12345",
+          "profileName" => "Test User"
         })
   
         expect(model_instance.id).to eq "12345"
@@ -18,6 +21,9 @@ RSpec.describe InvestecOpenApi::Models::Account do
         expect(model_instance.name).to eq "Test User"
         expect(model_instance.reference_name).to eq "Savings Account"
         expect(model_instance.product_name).to eq "Private Bank Account"
+        expect(model_instance.kyc_compliant).to eq true
+        expect(model_instance.profile_id).to eq "12345"
+        expect(model_instance.profile_name).to eq "Test User"
       end
     end
 
