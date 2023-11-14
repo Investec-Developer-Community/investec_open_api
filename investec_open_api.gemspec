@@ -30,7 +30,6 @@ Gem::Specification.new do |spec|
   # add runtime dependencies
   spec.add_runtime_dependency 'active_attr'
   spec.add_runtime_dependency 'faraday'
-  spec.add_runtime_dependency 'faraday_middleware'
   spec.add_runtime_dependency 'money'
 
   # add development dependencies

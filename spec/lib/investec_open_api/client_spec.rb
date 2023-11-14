@@ -4,31 +4,31 @@ require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
 
 RSpec.describe InvestecOpenApi::Client do
-  let(:client)  { InvestecOpenApi::Client.new }
+  let(:client) { InvestecOpenApi::Client.new }
   let(:api_url) { 'https://openapi.investec.com/' }
 
   before do
-    InvestecOpenApi.api_key       = "TESTKEY"
-    InvestecOpenApi.client_id     = "Test"
+    InvestecOpenApi.api_key = "TESTKEY"
+    InvestecOpenApi.client_id = "Test"
     InvestecOpenApi.client_secret = "Secret"
 
     stub_request(:post, "#{api_url}identity/v2/oauth2/token")
       .with(
-          body: {"grant_type"=>"client_credentials"},
-          headers: {
-            'Accept'=>'*/*',
-            'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-            'Authorization'=>'Basic VGVzdDpTZWNyZXQ=',
-            'Content-Type'=>'application/x-www-form-urlencoded',
-            'User-Agent'=>'Faraday v1.10.3',
-            'X-Api-Key'=>'TESTKEY'
-          })
+        body: { "grant_type" => "client_credentials" },
+        headers: {
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Authorization' => 'Basic VGVzdDpTZWNyZXQ=',
+          'Content-Type' => 'application/x-www-form-urlencoded',
+          'User-Agent' => 'Faraday v2.7.11',
+          'X-Api-Key' => 'TESTKEY'
+        })
       .to_return(status: 200, body: {
-              "access_token": "123",
-              "token_type": "Bearer",
-              "expires_in": 1799,
-              "scope": "accounts"
-          }.to_json, headers: {})
+        "access_token": "123",
+        "token_type": "Bearer",
+        "expires_in": 1799,
+        "scope": "accounts"
+      }.to_json, headers: {})
   end
 
   describe "#accounts" do
@@ -40,7 +40,7 @@ RSpec.describe InvestecOpenApi::Client do
             "Accept" => "application/json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v1.10.3"
+            "User-Agent" => "Faraday v2.7.11"
           }
         )
         .to_return(
@@ -63,7 +63,10 @@ RSpec.describe InvestecOpenApi::Client do
                 }
               ]
             }
-          }.to_json
+          }.to_json,
+          headers: {
+            "Content-Type" => "application/json"
+          }
         )
 
       client.authenticate!
@@ -127,7 +130,7 @@ RSpec.describe InvestecOpenApi::Client do
         "Accept" => "application/json",
         "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
         "Authorization" => "Bearer 123",
-        "User-Agent" => "Faraday v1.10.3"
+        "User-Agent" => "Faraday v2.7.11"
       }
     end
 
@@ -139,7 +142,11 @@ RSpec.describe InvestecOpenApi::Client do
       before do
         stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions")
           .with(body: "", headers: headers)
-          .to_return(body: transaction_data)
+          .to_return(
+            body: transaction_data,
+            headers: {
+              "Content-Type" => "application/json"
+            })
       end
 
       it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
@@ -154,7 +161,11 @@ RSpec.describe InvestecOpenApi::Client do
       before do
         stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions?fromDate=2021-01-01&toDate=2023-01-01&page=4")
           .with(body: "", headers: headers)
-          .to_return(body: transaction_data)
+          .to_return(
+            body: transaction_data,
+            headers: {
+              "Content-Type" => "application/json"
+            })
       end
 
       it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
