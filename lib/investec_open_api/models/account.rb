@@ -5,6 +5,9 @@ module InvestecOpenApi::Models
     attribute :name
     attribute :reference_name
     attribute :product_name
+    attribute :kyc_compliant
+    attribute :profile_id
+    attribute :profile_name
 
     def self.from_api(params = {})
       if params['accountId'].present?

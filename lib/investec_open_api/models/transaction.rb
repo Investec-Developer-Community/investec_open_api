@@ -5,10 +5,12 @@ module InvestecOpenApi::Models
     attribute :account_id
     attribute :posted_order
     attribute :type
+    attribute :transaction_type
     attribute :status
     attribute :card_number
     attribute :amount
     attribute :description
+    attribute :running_balance
     attribute :date, type: Date
     attribute :posting_date, type: Date
     attribute :value_date, type: Date
@@ -32,6 +34,14 @@ module InvestecOpenApi::Models
         Money.rounding_mode = BigDecimal::ROUND_HALF_UP
         Money.locale_backend = :i18n
         params['amount'] = Money.from_cents(adjusted_amount, "ZAR")
+      end
+
+      if params['runningBalance'].present?
+        adjusted_amount = params['runningBalance'] * 100
+
+        Money.rounding_mode = BigDecimal::ROUND_HALF_UP
+        Money.locale_backend = :i18n
+        params['runningBalance'] = Money.from_cents(adjusted_amount, "ZAR")
       end
 
       if params['transactionDate']
