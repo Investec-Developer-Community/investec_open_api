@@ -2,6 +2,7 @@ require "faraday"
 require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
 require "investec_open_api/camel_case_refinement"
+require 'base64'
 
 class InvestecOpenApi::Client
   using InvestecOpenApi::CamelCaseRefinement
@@ -35,7 +36,7 @@ class InvestecOpenApi::Client
   private
 
   def get_oauth_token
-    auth_token = Base64.strict_encode64("#{InvestecOpenApi.client_id}:#{InvestecOpenApi.client_secret}")
+    auth_token = ::Base64.strict_encode64("#{InvestecOpenApi.client_id}:#{InvestecOpenApi.client_secret}")
 
     response = Faraday.post(
       "#{INVESTEC_API_URL}identity/v2/oauth2/token",
