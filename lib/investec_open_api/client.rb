@@ -6,7 +6,6 @@ require 'base64'
 
 class InvestecOpenApi::Client
   using InvestecOpenApi::CamelCaseRefinement
-  INVESTEC_API_URL="https://openapi.investec.com/"
 
   def authenticate!
     @token = get_oauth_token["access_token"]
@@ -36,13 +35,13 @@ class InvestecOpenApi::Client
   private
 
   def get_oauth_token
-    auth_token = ::Base64.strict_encode64("#{InvestecOpenApi.client_id}:#{InvestecOpenApi.client_secret}")
+    auth_token = ::Base64.strict_encode64("#{InvestecOpenApi.config.client_id}:#{InvestecOpenApi.config.client_secret}")
 
     response = Faraday.post(
-      "#{INVESTEC_API_URL}identity/v2/oauth2/token",
+      "#{InvestecOpenApi.config.base_url}identity/v2/oauth2/token",
       { grant_type: "client_credentials" },
       {
-        'x-api-key' => InvestecOpenApi.api_key,
+        'x-api-key' => InvestecOpenApi.config.api_key,
         'Authorization' => "Basic #{auth_token}"
       }
     )
@@ -51,7 +50,7 @@ class InvestecOpenApi::Client
   end
 
   def connection
-    @_connection ||= Faraday.new(url: INVESTEC_API_URL) do |builder|
+    @_connection ||= Faraday.new(url: InvestecOpenApi.config.base_url) do |builder|
       if @token
         builder.headers["Authorization"] = "Bearer #{@token}"
       end

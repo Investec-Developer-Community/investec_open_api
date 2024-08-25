@@ -8,9 +8,10 @@ RSpec.describe InvestecOpenApi::Client do
   let(:api_url) { 'https://openapi.investec.com/' }
 
   before do
-    InvestecOpenApi.api_key = "TESTKEY"
-    InvestecOpenApi.client_id = "Test"
-    InvestecOpenApi.client_secret = "Secret"
+    InvestecOpenApi.config.api_key = "TESTKEY"
+    InvestecOpenApi.config.client_id = "Test"
+    InvestecOpenApi.config.client_secret = "Secret"
+    InvestecOpenApi.config.base_url = api_url
 
     stub_request(:post, "#{api_url}identity/v2/oauth2/token")
       .with(
