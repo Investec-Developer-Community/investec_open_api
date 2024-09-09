@@ -6,9 +6,29 @@ require "investec_open_api/client"
 module InvestecOpenApi
   class Error < StandardError; end
 
-  mattr_accessor :api_key, :client_id, :client_secret, :scope
+  class Configuration
+    DEFAULT_BASE_URL = "https://openapi.investec.com/"
 
-  def self.configuration(&block)
-    yield self
+    attr_accessor :api_key,
+                  :client_id,
+                  :client_secret,
+                  :scope,
+                  :base_url
+
+    def initialize
+      @base_url = DEFAULT_BASE_URL
+
+      Money.locale_backend = :i18n
+    end
+  end
+
+  class << self
+    def config
+      @config ||= Configuration.new
+    end
+
+    def configuration
+      yield config
+    end
   end
 end

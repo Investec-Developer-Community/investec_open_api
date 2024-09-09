@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "investec_open_api"
+
+# You can add fixtures and/or initialization code here to make experimenting
+# with your gem easier. You can also use a different console, if you like.
+
+InvestecOpenApi.configuration do |config|
+  config.api_key = "eUF4elFSRlg5N3ZPY3lRQXdsdUVVNkg2ZVB4TUE1ZVk6YVc1MlpYTjBaV010ZW1FdGNHSXRZV05qYjNWdWRITXRjMkZ1WkdKdmVBPT0="
+  config.client_id = "yAxzQRFX97vOcyQAwluEU6H6ePxMA5eY"
+  config.client_secret = "4dY0PjEYqoBrZ99r"
+  config.base_url = "https://openapisandbox.investec.com/"
+end
+
+# (If you use this, don't forget to add pry to your Gemfile!)
+require "pry"
+Pry.start
+
+# require "irb"
+# IRB.start(__FILE__)

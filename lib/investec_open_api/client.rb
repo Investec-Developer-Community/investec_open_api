@@ -1,12 +1,13 @@
 require "faraday"
 require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
+require "investec_open_api/models/balance"
+require "investec_open_api/models/transfer"
 require "investec_open_api/camel_case_refinement"
 require 'base64'
 
 class InvestecOpenApi::Client
   using InvestecOpenApi::CamelCaseRefinement
-  INVESTEC_API_URL="https://openapi.investec.com/"
 
   def authenticate!
     @token = get_oauth_token["access_token"]
@@ -26,23 +27,49 @@ class InvestecOpenApi::Client
       query_string = URI.encode_www_form(options.camelize)
       endpoint_url += "?#{query_string}"
     end
-    
+
     response = connection.get(endpoint_url)
     response.body["data"]["transactions"].map do |transaction_raw|
       InvestecOpenApi::Models::Transaction.from_api(transaction_raw)
     end
   end
 
+  def balance(account_id)
+    endpoint_url = "za/pb/v1/accounts/#{account_id}/balance"
+    response = connection.get(endpoint_url)
+    raise "Error fetching balance" if response.body["data"].nil?
+    InvestecOpenApi::Models::Balance.from_api(response.body["data"])
+  end
+
+  # @param [String] account_id
+  # @param [Array<InvestecOpenApi::Models::Transfer>] transfers
+  def transfer_multiple(
+    account_id,
+    transfers,
+    profile_id = nil
+  )
+    endpoint_url = "za/pb/v1/accounts/#{account_id}/transfermultiple"
+    data = {
+      transferList: transfers.map(&:to_h),
+    }
+    data[:profileId] = profile_id if profile_id
+    response = connection.post(
+      endpoint_url,
+      JSON.generate(data)
+    )
+    response.body
+  end
+
   private
 
   def get_oauth_token
-    auth_token = ::Base64.strict_encode64("#{InvestecOpenApi.client_id}:#{InvestecOpenApi.client_secret}")
+    auth_token = ::Base64.strict_encode64("#{InvestecOpenApi.config.client_id}:#{InvestecOpenApi.config.client_secret}")
 
     response = Faraday.post(
-      "#{INVESTEC_API_URL}identity/v2/oauth2/token",
+      "#{InvestecOpenApi.config.base_url}identity/v2/oauth2/token",
       { grant_type: "client_credentials" },
       {
-        'x-api-key' => InvestecOpenApi.api_key,
+        'x-api-key' => InvestecOpenApi.config.api_key,
         'Authorization' => "Basic #{auth_token}"
       }
     )
@@ -51,7 +78,7 @@ class InvestecOpenApi::Client
   end
 
   def connection
-    @_connection ||= Faraday.new(url: INVESTEC_API_URL) do |builder|
+    @_connection ||= Faraday.new(url: InvestecOpenApi.config.base_url) do |builder|
       if @token
         builder.headers["Authorization"] = "Bearer #{@token}"
       end

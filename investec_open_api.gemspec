@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # add runtime dependencies
-  spec.add_runtime_dependency 'active_attr'
   spec.add_runtime_dependency 'faraday'
   spec.add_runtime_dependency 'money'
 
@@ -36,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'webmock'
+  spec.add_development_dependency 'faker'
 end
