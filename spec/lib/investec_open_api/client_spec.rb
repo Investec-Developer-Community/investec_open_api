@@ -2,6 +2,7 @@ require "spec_helper"
 require "investec_open_api/client"
 require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
+require "investec_open_api/models/transfer"
 
 RSpec.describe InvestecOpenApi::Client do
   let(:client) { InvestecOpenApi::Client.new }
@@ -157,7 +158,7 @@ RSpec.describe InvestecOpenApi::Client do
     end
 
     context "when filter parameters are specified" do
-      let(:options) { {from_date: "2021-01-01", to_date: "2023-01-01", page: 4} }
+      let(:options) { { from_date: "2021-01-01", to_date: "2023-01-01", page: 4 } }
 
       before do
         stub_request(:get, "#{api_url}za/pb/v1/accounts/12345/transactions?fromDate=2021-01-01&toDate=2023-01-01&page=4")
@@ -173,6 +174,73 @@ RSpec.describe InvestecOpenApi::Client do
         transactions = client.transactions("12345", options)
         expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
       end
+    end
+  end
+
+  describe "#transfer_multiple" do
+    let(:account_id) { Faker::Number.number(digits: 10).to_s }
+    let(:beneficiary_account_id) { Faker::Number.number(digits: 10).to_s }
+    let(:transfer_amount) { Faker::Number.decimal(l_digits: 2) }
+    let(:my_reference) { Faker::Lorem.words(number: 5).join(" ") }
+    let(:their_reference) { Faker::Lorem.words(number: 5).join(" ") }
+    let(:transfer_response) do
+      {
+        "PaymentReferenceNumber" => Faker::Lorem.words(number: 5).join(" "),
+        "PaymentDate" => Date.today.to_s,
+        "Status" => "- No authorisation necessary <BR>- Payment/Transfer effective date #{Date.today}",
+        "BeneficiaryName" =>  "Transfer Test",
+        "BeneficiaryAccountId" => beneficiary_account_id,
+        "AuthorisationRequired" => false
+      }
+    end
+    let(:response_body) do
+      {
+        "TransferResponse" => [transfer_response],
+        "links" => {
+          "self" => "https://openapisandbox.investec.com/za/pb/v1/accounts/3353431574710163189587446/transfermultiple"
+        },
+        "meta" => {
+          "totalPages" => 1
+        }
+      }
+    end
+
+    before do
+      client.authenticate!
+      stub_request(:post, "#{api_url}za/pb/v1/accounts/#{account_id}/transfermultiple")
+        .with(
+          body: {
+            transferList: [{
+                             beneficiaryAccountId: beneficiary_account_id,
+                             amount: transfer_amount.to_s,
+                             myReference: my_reference,
+                             theirReference: their_reference
+                           }]
+          },
+          headers: {
+            "Accept" => "application/json",
+            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "Authorization" => "Bearer 123",
+            "User-Agent" => "Faraday v2.9.0"
+          }
+        )
+        .to_return(
+          body: response_body.to_json,
+          headers: {
+            "Content-Type" => "application/json"
+          }
+        )
+    end
+
+    it "returns a response with the transfer details" do
+      transfer = InvestecOpenApi::Models::Transfer.new(
+        beneficiary_account_id,
+        transfer_amount,
+        my_reference,
+        their_reference
+      )
+      result = client.transfer_multiple(account_id, [transfer])
+      expect(result).to eq response_body
     end
   end
 end

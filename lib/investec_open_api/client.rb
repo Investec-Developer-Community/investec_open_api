@@ -1,6 +1,8 @@
 require "faraday"
 require "investec_open_api/models/account"
 require "investec_open_api/models/transaction"
+require "investec_open_api/models/balance"
+require "investec_open_api/models/transfer"
 require "investec_open_api/camel_case_refinement"
 require 'base64'
 
@@ -25,11 +27,37 @@ class InvestecOpenApi::Client
       query_string = URI.encode_www_form(options.camelize)
       endpoint_url += "?#{query_string}"
     end
-    
+
     response = connection.get(endpoint_url)
     response.body["data"]["transactions"].map do |transaction_raw|
       InvestecOpenApi::Models::Transaction.from_api(transaction_raw)
     end
+  end
+
+  def balance(account_id)
+    endpoint_url = "za/pb/v1/accounts/#{account_id}/balance"
+    response = connection.get(endpoint_url)
+    raise "Error fetching balance" if response.body["data"].nil?
+    InvestecOpenApi::Models::Balance.from_api(response.body["data"])
+  end
+
+  # @param [String] account_id
+  # @param [Array<InvestecOpenApi::Models::Transfer>] transfers
+  def transfer_multiple(
+    account_id,
+    transfers,
+    profile_id = nil
+  )
+    endpoint_url = "za/pb/v1/accounts/#{account_id}/transfermultiple"
+    data = {
+      transferList: transfers.map(&:to_h),
+    }
+    data[:profileId] = profile_id if profile_id
+    response = connection.post(
+      endpoint_url,
+      JSON.generate(data)
+    )
+    response.body
   end
 
   private
