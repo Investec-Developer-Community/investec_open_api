@@ -11,7 +11,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
           "status" => "POSTED",
           "cardNumber" => "400000xxxxxx0001",
           "amount" => 50000.32,
-          "description" => "COFFEE",
+          "description" => "Zapper COFFEE SHOP ZA",
           "transactionDate" => "2020-07-13",
           "postedOrder" => 1,
           "postingDate" => "2020-07-14",
@@ -28,7 +28,7 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         expect(model_instance.amount.class).to eq Money
         expect(model_instance.amount.to_f).to eq -50000.32
         expect(model_instance.amount.format).to eq "R-50000.32"
-        expect(model_instance.description).to eq "COFFEE"
+        expect(model_instance.description).to eq "Zapper COFFEE SHOP ZA"
         expect(model_instance.date).to eq Date.parse("2020-07-13")
         expect(model_instance.posting_date).to eq Date.parse("2020-07-14")
         expect(model_instance.posted_order).to eq 1
@@ -46,7 +46,10 @@ RSpec.describe InvestecOpenApi::Models::Transaction do
         model_instance = InvestecOpenApi::Models::Transaction.from_api({
           "accountId" => "12345",
           "type" => "DEBIT",
-          "bankAccountNumber" => "67890"
+          "bankAccountNumber" => "67890",
+          "description" => "Zapper COFFEE SHOP ZA",
+          "date" => "2020-07-13",
+          "amount" => 50000.32
         })
 
         expect(model_instance.account_id).to eq "12345"
