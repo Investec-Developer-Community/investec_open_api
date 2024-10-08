@@ -20,18 +20,25 @@ class InvestecOpenApi::Client
     end
   end
 
+  ## Get cleared transactions for an account
+  # @param [String] account_id The id of the account to get transactions for
+  # @param [Hash] options
+  # @option options [String] :fromDate Start date from which to get transactions
+  # @option options [String] :toDate End date for transactions
+  # @option options [String] :transactionType Type of transaction to filter by eg: CardPurchases, Deposits
   def transactions(account_id, options = {})
     endpoint_url = "za/pb/v1/accounts/#{account_id}/transactions"
+    perform_transaction_request(endpoint_url, options)
+  end
 
-    unless options.empty?
-      query_string = URI.encode_www_form(options.camelize)
-      endpoint_url += "?#{query_string}"
-    end
-
-    response = connection.get(endpoint_url)
-    response.body["data"]["transactions"].map do |transaction_raw|
-      InvestecOpenApi::Models::Transaction.from_api(transaction_raw)
-    end
+  ## Get pending transactions for an account
+  # @param [String] account_id The id of the account to get pending transactions for
+  # @param [Hash] options
+  # @option options [String] :fromDate Start date from which to get pending transactions
+  # @option options [String] :toDate End date for pending transactions
+  def pending_transactions(account_id, options = {})
+    endpoint_url = "za/pb/v1/accounts/#{account_id}/pending-transactions"
+    perform_transaction_request(endpoint_url, options)
   end
 
   def balance(account_id)
@@ -90,6 +97,18 @@ class InvestecOpenApi::Client
       builder.response :json
 
       builder.adapter Faraday.default_adapter
+    end
+  end
+
+  def perform_transaction_request(endpoint_url, options)
+    unless options.empty?
+      query_string = URI.encode_www_form(options.camelize)
+      endpoint_url += "?#{query_string}"
+    end
+
+    response = connection.get(endpoint_url)
+    response.body["data"]["transactions"].map do |transaction_raw|
+      InvestecOpenApi::Models::Transaction.from_api(transaction_raw)
     end
   end
 end

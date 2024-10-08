@@ -3,6 +3,7 @@ require "money"
 module InvestecOpenApi::Models
   class Transaction < Base
     attr_reader :id,
+                :uuid,
                 :account_id,
                 :posted_order,
                 :type,
@@ -22,8 +23,8 @@ module InvestecOpenApi::Models
       set_id
     end
 
-    # At this point, there is no unique identifier being returned from Investec's API.
-    # This method serves to create a stable unique identifier based on the transaction details.
+    # Investec exposes a uuid for uniqueness so this is no longer needed (non-pending transactions).
+    # It is kept here for legacy purposes. It is also useful for pending transactions.
     def set_id
       @id = [
         amount.to_i,

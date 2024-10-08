@@ -7,6 +7,14 @@ require "investec_open_api/models/transfer"
 RSpec.describe InvestecOpenApi::Client do
   let(:client) { InvestecOpenApi::Client.new }
   let(:api_url) { 'https://openapi.investec.com/' }
+  let(:headers) do
+    {
+      "Accept" => "application/json",
+      "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+      "Authorization" => "Bearer 123",
+      "User-Agent" => "Faraday v2.9.0"
+    }
+  end
 
   before do
     InvestecOpenApi.config.api_key = "TESTKEY"
@@ -17,14 +25,12 @@ RSpec.describe InvestecOpenApi::Client do
     stub_request(:post, "#{api_url}identity/v2/oauth2/token")
       .with(
         body: { "grant_type" => "client_credentials" },
-        headers: {
+        headers: headers.merge({
           'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
           'Authorization' => 'Basic VGVzdDpTZWNyZXQ=',
           'Content-Type' => 'application/x-www-form-urlencoded',
-          'User-Agent' => 'Faraday v2.9.0',
           'X-Api-Key' => 'TESTKEY'
-        })
+        }))
       .to_return(status: 200, body: {
         "access_token": "123",
         "token_type": "Bearer",
@@ -38,12 +44,7 @@ RSpec.describe InvestecOpenApi::Client do
       stub_request(:get, "#{api_url}za/pb/v1/accounts")
         .with(
           body: "",
-          headers: {
-            "Accept" => "application/json",
-            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-            "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v2.9.0"
-          }
+          headers: headers
         )
         .to_return(
           body: {
@@ -127,15 +128,6 @@ RSpec.describe InvestecOpenApi::Client do
       }.to_json
     end
 
-    let(:headers) do
-      {
-        "Accept" => "application/json",
-        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-        "Authorization" => "Bearer 123",
-        "User-Agent" => "Faraday v2.9.0"
-      }
-    end
-
     before do
       client.authenticate!
     end
@@ -173,6 +165,82 @@ RSpec.describe InvestecOpenApi::Client do
       it "returns all transactions for the specified account id as InvestecOpenApi::Models::Transaction instances" do
         transactions = client.transactions("12345", options)
         expect(transactions.first).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+      end
+    end
+  end
+
+  describe "#pending_transactions" do
+    let(:account_id) { Faker::Number.number(digits: 10).to_s }
+    let(:pending_transaction_data) do
+      {
+        data: {
+          transactions: [
+            {
+              accountId: account_id,
+              type: "DEBIT",
+              status: "PENDING",
+              description: Faker::Lorem.sentence(word_count: 3),
+              transactionDate: Faker::Date.between(from: Date.today - 2, to: Date.today).to_s,
+              amount: Faker::Number.decimal(l_digits: 2)
+            },
+            {
+              accountId: account_id,
+              type: "DEBIT",
+              status: "PENDING",
+              description: Faker::Lorem.sentence(word_count: 3),
+              transactionDate: Faker::Date.between(from: Date.today - 5, to: Date.today - 3).to_s,
+              amount: Faker::Number.decimal(l_digits: 2)
+            }
+          ]
+        }
+      }
+    end
+
+    context "when no filter parameters are specified" do
+      before do
+        stub_request(:get, "#{api_url}za/pb/v1/accounts/#{account_id}/pending-transactions")
+          .with(headers: headers)
+          .to_return(
+            body: pending_transaction_data.to_json,
+            headers: {
+              "Content-Type" => "application/json"
+            })
+        client.authenticate!
+      end
+
+      it "should not filter out any results" do
+        transactions = client.pending_transactions(account_id)
+        transactions.each_index do |index|
+          expect(transactions[index]).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+          expect(transactions[index].description)
+            .to eq(pending_transaction_data[:data][:transactions][index][:description])
+        end
+      end
+    end
+
+    context "when filter parameters are specified" do
+      let(:options) { { from_date: "2024-01-01", to_date: "2024-02-01" } }
+      before do
+        stub_request(
+          :get,
+          "#{api_url}za/pb/v1/accounts/#{account_id}/pending-transactions?fromDate=2024-01-01&toDate=2024-02-01"
+        )
+          .with(headers: headers)
+          .to_return(
+            body: pending_transaction_data.to_json,
+            headers: {
+              "Content-Type" => "application/json"
+            })
+        client.authenticate!
+      end
+
+      it "should filter out results based on options object" do
+        transactions = client.pending_transactions(account_id, options)
+        transactions.each_index do |index|
+          expect(transactions[index]).to be_an_instance_of(InvestecOpenApi::Models::Transaction)
+          expect(transactions[index].description)
+            .to eq(pending_transaction_data[:data][:transactions][index][:description])
+        end
       end
     end
   end
@@ -217,12 +285,7 @@ RSpec.describe InvestecOpenApi::Client do
                              theirReference: their_reference
                            }]
           },
-          headers: {
-            "Accept" => "application/json",
-            "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-            "Authorization" => "Bearer 123",
-            "User-Agent" => "Faraday v2.9.0"
-          }
+          headers: headers
         )
         .to_return(
           body: response_body.to_json,
