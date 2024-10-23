@@ -86,7 +86,15 @@ my_account = accounts.first
 You can list your transactions by passing the account id into the `transactions` method:
 
 ```ruby
-client.transactions(my_account.id)
+# The dates are optional
+client.transactions(my_account.id, { fromDate: "2024-01-01", toDate: "2024-01-31" })
+```
+
+To list pending transactions use the following:
+
+```ruby
+# The dates are optional
+client.pending_transactions(my_account.id, { fromDate: "2024-01-01", toDate: "2024-01-31" })
 ```
 
 ### Get Balance for an account
