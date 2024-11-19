@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    investec_open_api (2.0.0)
+    investec_open_api (2.1.0)
       faraday
       money
 
