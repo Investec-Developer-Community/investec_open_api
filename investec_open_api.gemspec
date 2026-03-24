@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{A small wrapper client for accessing Investec's Open API}
   spec.homepage      = "https://github.com/programmable-banking-community/investec_open_api"
   spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   # add runtime dependencies
   spec.add_runtime_dependency 'faraday'
   spec.add_runtime_dependency 'money'
+  spec.add_runtime_dependency 'base64'
 
   # add development dependencies
   spec.add_development_dependency 'rake'

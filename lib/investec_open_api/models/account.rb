@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module InvestecOpenApi::Models
   class Account < Base
     attr_reader :id,
