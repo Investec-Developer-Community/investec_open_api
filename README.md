@@ -16,6 +16,10 @@ A simple client wrapper for the [Investec Open API](https://developer.investec.c
 - Retrieve balances per account
 - Transfer between accounts
 
+## Requirements
+
+- **Ruby 2.7.0 or higher**
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -121,6 +125,83 @@ client.transfer_multiple(
   [ transfer ],
   profile_id # optional
 )
+```
+
+## Error Handling
+
+The client raises specific exceptions for different error scenarios. Always wrap API calls in error handling:
+
+### Custom Exception Classes
+
+- `InvestecOpenApi::AuthenticationError` - Raised when OAuth authentication fails
+- `InvestecOpenApi::ValidationError` - Raised when required parameters are missing or invalid
+- `InvestecOpenApi::NotFoundError` - Raised when a requested resource is not found
+- `InvestecOpenApi::APIError` - Raised for general API errors
+- `InvestecOpenApi::RateLimitError` - Raised when rate limits are exceeded
+
+### Example: Handling Errors
+
+```ruby
+client = InvestecOpenApi::Client.new
+
+begin
+  client.authenticate!
+rescue InvestecOpenApi::AuthenticationError => e
+  puts "Authentication failed: #{e.message}"
+  # Handle authentication error
+end
+
+begin
+  transactions = client.transactions(account_id)
+rescue InvestecOpenApi::ValidationError => e
+  puts "Invalid parameters: #{e.message}"
+  # Handle validation error
+rescue InvestecOpenApi::NotFoundError => e
+  puts "Account not found: #{e.message}"
+  # Handle not found error
+rescue InvestecOpenApi::APIError => e
+  puts "API error occurred: #{e.message}"
+  # Handle general API error
+end
+
+begin
+  transfer = InvestecOpenApi::Models::Transfer.new(
+    beneficiary_id,
+    1000.00,
+    "my ref",
+    "their ref"
+  )
+rescue InvestecOpenApi::ValidationError => e
+  puts "Invalid transfer parameters: #{e.message}"
+  # Handle validation error
+end
+```
+
+## Thread Safety
+
+**Important:** The client instance caches a Faraday connection object. If you're using this client in a multi-threaded environment (such as a Rails application), ensure that each thread has its own instance of `InvestecOpenApi::Client`:
+
+```ruby
+# ✅ Correct: Each thread gets its own client
+threads = 5.times.map do
+  Thread.new do
+    client = InvestecOpenApi::Client.new
+    client.authenticate!
+    # Use the client...
+  end
+end
+threads.each(&:join)
+
+# ❌ Incorrect: Sharing a single client across threads
+client = InvestecOpenApi::Client.new
+client.authenticate!
+threads = 5.times.map do
+  Thread.new do
+    # Don't do this - connection caching is not thread-safe
+    client.accounts
+  end
+end
+threads.each(&:join)
 ```
 
 ## Running in Sandbox mode

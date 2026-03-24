@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module InvestecOpenApi
   module StringUtilities
     refine String do

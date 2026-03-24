@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "investec_open_api/version"
 require "investec_open_api/models/base"
 require "investec_open_api/camel_case_refinement"
@@ -5,6 +7,11 @@ require "investec_open_api/client"
 
 module InvestecOpenApi
   class Error < StandardError; end
+  class AuthenticationError < Error; end
+  class NotFoundError < Error; end
+  class ValidationError < Error; end
+  class APIError < Error; end
+  class RateLimitError < Error; end
 
   class Configuration
     DEFAULT_BASE_URL = "https://openapi.investec.com/"
